@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Head, useForm } from '@inertiajs/react'
 import { Button } from '@/Components/ui/button'
 import { Input } from '@/Components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/Components/ui/checkbox'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
 import {
@@ -19,6 +18,7 @@ import {
   Server,
   Clock
 } from 'lucide-react'
+import { Label } from '@/Components/ui/label'
 
 interface LoginProps {
   systemName: string
@@ -45,9 +45,7 @@ export default function Login({ systemName = 'Activity Tracker Pro', version = '
 
   const systemFeatures = [
     { icon: BarChart3, label: 'Real-time Analytics', description: 'Live activity monitoring and reporting' },
-    { icon: Users, label: 'Team Management', description: 'Track team performance and productivity' },
     { icon: Network, label: 'Activity Tracking', description: 'Comprehensive daily activity logging' },
-    { icon: Server, label: 'System Integration', description: 'Seamless integration with existing systems' },
   ]
 
   return (
@@ -60,9 +58,6 @@ export default function Login({ systemName = 'Activity Tracker Pro', version = '
           <div>
             {/* System Header */}
             <div className="flex items-center space-x-3 mb-12">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg flex items-center justify-center shadow-lg">
-                <Shield className="h-6 w-6" />
-              </div>
               <div>
                 <h1 className="text-2xl font-bold">{systemName}</h1>
                 <p className="text-blue-200 text-sm">Management System</p>
@@ -105,7 +100,7 @@ export default function Login({ systemName = 'Activity Tracker Pro', version = '
             </div>
             <div className="flex items-center space-x-2">
               <Clock className="h-4 w-4" />
-              <span>{new Date().getFullYear()} © Your Company</span>
+              <span>{new Date().getFullYear()} © Samuel Afriyie</span>
             </div>
           </div>
         </div>
@@ -116,10 +111,8 @@ export default function Login({ systemName = 'Activity Tracker Pro', version = '
             {/* Mobile Header */}
             <div className="lg:hidden text-center mb-8">
               <div className="flex items-center justify-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-white" />
-                </div>
-                <div className="text-left">
+                
+                <div className="text-center">
                   <h1 className="text-xl font-bold text-white">{systemName}</h1>
                   <p className="text-blue-200 text-sm">Management System</p>
                 </div>
@@ -129,12 +122,9 @@ export default function Login({ systemName = 'Activity Tracker Pro', version = '
             {/* Login Card */}
             <Card className="bg-white/95 backdrop-blur-sm border-slate-200 shadow-2xl">
               <CardHeader className="text-center space-y-4 pb-6">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-r from-slate-800 to-slate-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Building className="h-8 w-8 text-white" />
-                </div>
                 <div>
                   <CardTitle className="text-xl font-bold text-slate-800">
-                    Secure System Access
+                    Activity Tracker Pro
                   </CardTitle>
                   <CardDescription className="text-slate-600">
                     Enter your corporate credentials
@@ -285,7 +275,7 @@ export default function Login({ systemName = 'Activity Tracker Pro', version = '
             {/* Mobile Footer */}
             <div className="lg:hidden mt-6 text-center">
               <p className="text-xs text-slate-400">
-                {systemName} {version} • {new Date().getFullYear()} © Your Company
+                {systemName} {version} • {new Date().getFullYear()} © Samuel Afriyie
               </p>
             </div>
           </div>

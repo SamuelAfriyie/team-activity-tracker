@@ -22,15 +22,21 @@ export default function AppLayout({ children }: PropsWithChildren) {
     <div className="flex h-screen">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r flex flex-col">
-        <div className="p-4 text-xl font-bold">Activity Tracker</div>
-        <nav className="flex-1">
+        <div className="p-4 text-xl font-bold">Activity Tracker Pro</div> 
+        <nav className="flex-1 space-y-1">
           {sidebarItems.map((item) => (
             <Link
               key={item.route}
               href={route(item.route)}
               className={cn(
-                'flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100',
-                url.startsWith(route(item.route)) ? 'bg-gray-200 font-semibold' : ''
+                'flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 mx-2 rounded-sm',
+                item.route === 'dashboard'
+                  ? url === '/'
+                    ? 'bg-muted font-semibold text-blue-600'
+                    : ''
+                  : url.startsWith(`/${item.route.split('.')[0]}`)
+                    ? 'bg-muted font-semibold text-blue-600'
+                    : ''
               )}
             >
               <item.icon className="w-5 h-5 mr-2" />
