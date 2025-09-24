@@ -19,9 +19,7 @@ class DailyActivityService
                 [
                     'master_activity_id' => $m->id,
                     'activity_date' => $date,
-                ],
-                [
-                    'status' => 'todo',
+                    'status' => 'pending',
                     'position' => $idx,
                 ]
             );

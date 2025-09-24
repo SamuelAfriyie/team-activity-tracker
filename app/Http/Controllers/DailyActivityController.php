@@ -17,7 +17,7 @@ class DailyActivityController extends Controller
     public function update(Request $request, DailyActivity $dailyActivity)
     {
         $data = $request->validate([
-            'status' => 'required|in:todo,in_progress,done',
+            'status' => 'required|in:pending,done',
             'remark' => 'nullable|string',
         ]);
         // create an update record

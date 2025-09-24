@@ -21,7 +21,7 @@ class DashboardController extends Controller
             app(DailyActivityService::class)->generate($date);
         }
 
-        $columns = ['todo', 'in_progress', 'done'];
+        $columns = ['pending', 'done'];
         $activities = [];
         foreach ($columns as $col) {
             $activities[$col] = DailyActivity::with(['master', 'latestUpdate.user', 'updates.user'])

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('daily_activity_id')->constrained('daily_activities')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->enum('status', ['todo', 'in_progress', 'done']);
+            $table->enum('status', ['pending', 'done']);
             $table->text('remark')->nullable();
             $table->timestamps();
         });

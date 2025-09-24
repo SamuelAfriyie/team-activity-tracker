@@ -30,7 +30,6 @@ export default function ActivityCard({ activity }: { activity: any }) {
                     <div className="font-semibold">{activity.master?.title}</div>
                     <div className="text-xs text-gray-500 mt-1">{activity.master?.description}</div>
                 </div>
-                {/* <div className="text-xs text-gray-600 text-nowrap">{latest ? `${latest.user?.name} • ${new Date(latest.created_at).toLocaleTimeString()}` : ""}</div> */}
             </div>
 
             <div className="space-y-3 my-4">

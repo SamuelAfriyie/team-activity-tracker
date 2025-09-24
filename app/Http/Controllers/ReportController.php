@@ -15,7 +15,7 @@ class ReportController extends Controller
             'from' => 'nullable|date',
             'to' => 'nullable|date',
             'user_id' => 'nullable|integer|exists:users,id',
-            'status' => 'nullable|in:todo,in_progress,done',
+            'status' => 'nullable|in:pending,done',
         ]);
 
         $from = $data['from'] ?? now()->subDays(7)->toDateString();

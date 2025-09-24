@@ -23,8 +23,6 @@ class User extends Authenticatable
         'password',
         'position',
         'department',
-        'employee_id',
-        'phone',
         'is_active',
         'last_login_at',
     ];

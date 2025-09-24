@@ -21,7 +21,7 @@ type Props = {
 
 export default function Dashboard() {
   const { props } = usePage<any>();
-  const serverActivities: Record<string, Activity[]> = props.activities || { todo: [], in_progress: [], done: [] };
+  const serverActivities: Record<string, Activity[]> = props.activities || { pending: [], done: [] };
   const date: string = props.date;
 
   const [filterDate, setDate] = useState<Date>();
@@ -44,8 +44,8 @@ export default function Dashboard() {
 
     // clone state
     const local = {
-      todo: [...(activities.todo || [])],
-      in_progress: [...(activities.in_progress || [])],
+      pending: [...(activities.pending || [])],
+      // in_progress: [...(activities.in_progress || [])], 
       done: [...(activities.done || [])],
     } as any;
 
@@ -79,7 +79,7 @@ export default function Dashboard() {
     }
   };
 
-  const columns = ["todo", "in_progress", "done"];
+  const columns = ["pending", "done"];
 
   return (
     <AppLayout>
@@ -115,7 +115,7 @@ export default function Dashboard() {
           <h2 className="text-lg font-semibold mb-4">Daily Board</h2>
 
           <DragDropContext onDragEnd={onDragEnd}>
-            <div className="grid grid-cols-3 gap-6 h-[calc(100vh-140px)]">
+            <div className="grid grid-cols-2 gap-6 h-[calc(100vh-140px)]">
               {columns.map((col) => (
                 <Droppable droppableId={col} key={col}>
                   {(provided, snapshot) => (
@@ -128,7 +128,7 @@ export default function Dashboard() {
                     >
                       {/* Column Header */}
                       <div className="px-3 py-2 border-b bg-white rounded-t-lg">
-                        <h3 className="capitalize font-medium">{col.replace("_", " ")}</h3>
+                        <h3 className="capitalize font-medium">{col}</h3>
                       </div>
 
                       {/* Scrollable Task Area */}

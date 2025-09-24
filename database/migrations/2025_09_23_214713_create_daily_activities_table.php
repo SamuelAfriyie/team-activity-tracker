@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('master_activity_id')->constrained('master_activities')->onDelete('cascade');
             $table->date('activity_date');
-            $table->enum('status', ['todo', 'in_progress', 'done'])->default('todo');
+            $table->enum('status', ['pending', 'done'])->default('pending');
             $table->unsignedInteger('position')->default(0);
             $table->text('remark')->nullable();
             $table->timestamps();

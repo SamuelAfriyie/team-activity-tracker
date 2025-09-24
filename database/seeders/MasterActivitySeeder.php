@@ -15,7 +15,6 @@ class MasterActivitySeeder extends Seeder
     {
         // Try to fetch a user (first or last)
         $user = User::query()->orderBy('id', 'asc')->first();
-            //   ?? User::query()->orderBy('id', 'desc')->first();
 
         if (!$user) {
             $this->command->error('No users found. Please seed users first.');

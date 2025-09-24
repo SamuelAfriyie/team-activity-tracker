@@ -233,7 +233,7 @@ export default function Reports({ auth, results, users, filters }: ReportsProps)
                         <SelectValue placeholder="All team members" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="-">All team members</SelectItem>
+                        <SelectItem value="all">All team members</SelectItem>
                         {users?.map((user) => (
                           <SelectItem key={user.id} value={user.id.toString()}>
                             {user.name}
@@ -251,8 +251,8 @@ export default function Reports({ auth, results, users, filters }: ReportsProps)
                         <SelectValue placeholder="All statuses" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="-">All statuses</SelectItem>
-                        <SelectItem value="todo">To Do</SelectItem>
+                        <SelectItem value="all">All statuses</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
                         <SelectItem value="done">Done</SelectItem>
                       </SelectContent>
                     </Select>
