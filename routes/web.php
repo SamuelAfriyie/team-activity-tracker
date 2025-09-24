@@ -27,14 +27,21 @@ Route::middleware(['auth'])->group(function () {
         '/daily-activities/reorder',
         [DailyActivityController::class, 'reorder']
     )->name('daily.reorder');
+    
     // Master activities CRUD (admins)
-    Route::resource(
-        'master-activities',
-        MasterActivityController::class
-    )->except(['show']);
+    // Route::resource(
+    //     'master-activities',
+    //     MasterActivityController::class
+    // )->except(['show']);
+
+    // Activities
+    Route::get('/activities', [MasterActivityController::class, 'index'])->name('activities.index');
+    Route::post('/activities', [MasterActivityController::class, 'store'])->name('activities.store');
+    Route::get('/activities/{activity}', [MasterActivityController::class, 'show'])->name('activities.show');
+    Route::put('/activities/{activity}', [MasterActivityController::class, 'update'])->name('activities.update');
+    Route::delete('/activities/{activity}', [MasterActivityController::class, 'destroy'])->name('activities.destroy');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    // Route::get('/daily-activities/{dailyActivity}/show', [DailyActivityController::class, 'show'])->name('daily.show');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 

@@ -11,7 +11,7 @@ import { route } from '@/lib/route'
 
 const sidebarItems = [
   { name: 'Dashboard', route: 'dashboard', icon: LayoutDashboard },
-  { name: 'Daily Activities', route: 'logout', icon: ClipboardList },
+  { name: 'Activities', route: 'activities.index', icon: ClipboardList },
   { name: 'Reports', route: 'reports.index', icon: FileClock },
 ]
 

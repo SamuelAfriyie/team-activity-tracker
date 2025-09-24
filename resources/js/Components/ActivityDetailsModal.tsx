@@ -105,12 +105,12 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onAddRemark }:
 
                         </div>
                     ) :
-                        <p>No Updates</p>
+                        <p className="text-xs text-red-300 font-bold">No updates available</p>
                     }
 
                     {/* Action Buttons */}
                     <div className="flex gap-2 pt-4">
-                        <Button onClick={onAddRemark} className="flex items-center gap-2">
+                        <Button onClick={onAddRemark} className="flex items-center gap-2 bg-blue-600  hover:bg-blue-700">
                             <Plus className="h-4 w-4" />
                             Add Remark
                         </Button>

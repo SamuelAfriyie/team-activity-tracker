@@ -2,47 +2,85 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DailyActivity;
 use App\Models\MasterActivity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class MasterActivityController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $masters = MasterActivity::orderBy('title')->get();
-        return inertia('MasterActivities/Index', ['masters' => $masters]);
+        $query = MasterActivity::with(['latestUpdate.user']);
+        // Search filter
+        if ($request->has('search') && $request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                    ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $activities = $query->orderBy('created_at', 'desc')->get();
+
+        return Inertia::render('Activities/Index', [
+            'activities' => $activities,
+            'filters' => $request->only(['search']),
+        ]);
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
-        $master = MasterActivity::create(array_merge($data, ['created_by' =>
-        $request->user()->id]));
+
+        $master = MasterActivity::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'created_by' => Auth::id()
+            // 'is_active' => true,
+        ]);
+
         // also create today's daily instance so it is immediately visible
-        \App\Models\DailyActivity::firstOrCreate([
+        DailyActivity::firstOrCreate([
             'master_activity_id' => $master->id,
             'activity_date' => now()->toDateString(),
-        ], ['status' => 'todo']);
+        ], ['status' => 'pending']);
         return redirect()->back();
+
+
+        return redirect()->back()->with('success', 'Activity created successfully!');
     }
 
-    public function update(Request $request, MasterActivity $masterActivity)
+    public function show(MasterActivity $activity)
     {
-        $data = $request->validate([
+        $activity->load(['updates.user' => function ($query) {
+            $query->orderBy('update_time', 'desc');
+        }]);
+
+        return Inertia::render('Activities/Show', [
+            'activity' => $activity,
+        ]);
+    }
+
+    public function update(Request $request, MasterActivity $activity)
+    {
+        $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
-        $masterActivity->update($data);
 
-        return redirect()->back();
+        $activity->update($request->only(['title', 'description']));
+
+        return redirect()->back()->with('success', 'Activity updated successfully!');
     }
 
-    public function destroy(MasterActivity $masterActivity)
+    public function destroy(MasterActivity $activity)
     {
-        $masterActivity->delete();
-        return redirect()->back();
+        $activity->update(['is_active' => false]);
+
+        return redirect()->route('activities.index')->with('success', 'Activity deleted successfully!');
     }
 }

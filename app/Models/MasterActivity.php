@@ -25,4 +25,14 @@ class MasterActivity extends Model
     {
         return $this->hasMany(DailyActivity::class);
     }
+
+    public function latestUpdate()
+    {
+        return $this->hasOne(ActivityUpdate::class, 'daily_activity_id')->latestOfMany();
+    }
+
+    public function updates()
+    {
+        return $this->hasMany(ActivityUpdate::class, 'daily_activity_id');
+    }
 }

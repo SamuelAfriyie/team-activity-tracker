@@ -76,6 +76,7 @@ export function AddRemarkModal({ isOpen, onClose, activity, onSubmit }: AddRemar
                         <Button
                             type="submit"
                             disabled={!remark.trim()}
+                            className="bg-blue-600  hover:bg-blue-700"
                         >
                             Add Remark
                         </Button>

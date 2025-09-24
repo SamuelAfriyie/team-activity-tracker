@@ -7,6 +7,11 @@ import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea
 import { route } from "@/lib/route";
 import { Button } from "@/Components/ui/button";
 import axios from "axios";
+import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/Components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 type Activity = any;
 type Props = {
@@ -19,12 +24,16 @@ export default function Dashboard() {
   const serverActivities: Record<string, Activity[]> = props.activities || { todo: [], in_progress: [], done: [] };
   const date: string = props.date;
 
+  const [filterDate, setDate] = useState<Date>();
+
   // maintain local state for optimistic UI
   const [activities, setActivities] = useState<Record<string, Activity[]>>(serverActivities);
 
   // update state when server props change (e.g., after navigation)
   useEffect(() => setActivities(serverActivities), [serverActivities]);
+
   console.log("Activities structure: ", serverActivities)
+
   async function onDragEnd(result: DropResult) {
     if (!result.destination) return;
 
@@ -54,24 +63,21 @@ export default function Dashboard() {
       payloadColumns[k] = local[k].map((a: any) => a.id);
     });
 
-    // Inertia.post(route("daily.reorder"), { columns: payloadColumns, date } as any, {
-    //   onError: () => {
-    //     alert("failed")
-    //     // if server fails, re-sync by reloading
-    //     Inertia.reload();
-    //   }
-    // });
-
     await axios.post(route("daily.reorder"), {
       columns: payloadColumns, date
     }).then(() => {
       console.log("Updated successfully");
     }).catch(() => {
       alert("failed")
-      // if server fails, re-sync by reloading
       Inertia.reload();
     });
   }
+
+  const handleDateSelect = (newDate: Date | undefined) => {
+    if (newDate) {
+      setDate(newDate);
+    }
+  };
 
   const columns = ["todo", "in_progress", "done"];
 
@@ -81,9 +87,26 @@ export default function Dashboard() {
         {/* 🔹 Top Navbar */}
         <header className="w-full bg-white shadow px-6 py-3 flex items-center justify-between">
           <h1 className="text-xl font-bold">Team Activity Tracker</h1>
-          <div className="flex items-center gap-3">
-            <span className="text-gray-600 text-sm">Date: {date}</span>
-            <Button variant="outline" size="sm">Switch Date</Button>
+
+          <div className="flex gap-3 items-center">
+            <span className="text-gray-600 text-sm">Date: {format(filterDate ?? date, "PPP")}</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size={'sm'} >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  Switch Date
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filterDate}
+                  onSelect={handleDateSelect}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </header>
 

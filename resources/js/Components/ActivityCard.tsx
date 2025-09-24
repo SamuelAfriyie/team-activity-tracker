@@ -14,11 +14,6 @@ export default function ActivityCard({ activity }: { activity: any }) {
     const latest = activity.latest_update || null;
 
     async function handleUpdateRemark(remark: string, timestamp: any) {
-        // Inertia.patch(route('daily.update', activity.id), {
-        //     remark,
-        //     status: activity?.status ?? "pending",
-        // });
-
         await axios.patch(route("daily.update", activity.id), {
             remark,
             status: activity?.status ?? "pending",
