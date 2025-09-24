@@ -23,8 +23,9 @@
   "include": [
     "vite-env.d.ts",
     "resources/js/**/*",
-    "vite.config.ts",
+    "vite.config.ts"
   ],
+  "types": ["ziggy-js"]
   // "exclude": [
   //   "node_modules",
   //   "vendor"

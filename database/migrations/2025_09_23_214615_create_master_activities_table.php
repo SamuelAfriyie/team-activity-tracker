@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('activities', function (Blueprint $table) {
+        Schema::create('master_activities', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('type'); // e.g., 'sms_count_comparison'
-            $table->json('metrics')->nullable(); // For storing activity-specific data
-            $table->boolean('is_active')->default(true);
+            $table->foreignId('created_by')->constrained('users')->onDelete('set null')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('activities');
+        Schema::dropIfExists('master_activities');
     }
 };

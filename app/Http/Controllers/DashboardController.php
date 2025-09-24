@@ -2,36 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Activity;
-use App\Models\ActivityUpdate;
-use App\Models\User;
-use Carbon\Carbon;
+use App\Console\Commands\GenerateDailyActivities;
+use App\Models\DailyActivity;
+use App\Services\DailyActivityService;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-     public function index()
+    use DispatchesJobs;
+
+    public function index(Request $request)
     {
-         $today = Carbon::today();
+        $date = $request->query('date', now()->toDateString());
 
-        $teamStats = [
-            'totalActivities' => Activity::where('is_active', true)->count(),
-            'teamMembers' => User::where('is_active', true)->count(),
-            'completedToday' => ActivityUpdate::whereDate('update_time', $today)
-                ->where('status', 'done')
-                ->count(),
-            'pendingReview' => ActivityUpdate::where('status', 'pending')->count(),
-        ];
+        if (DailyActivity::where('activity_date', $date)->count() === 0) {
+            app(DailyActivityService::class)->generate($date);
+        }
 
-        $activities = Activity::with(['latestUpdate.user'])
-            ->where('is_active', true)
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
+        $columns = ['todo', 'in_progress', 'done'];
+        $activities = [];
+        foreach ($columns as $col) {
+            $activities[$col] = DailyActivity::with(['master', 'latestUpdate.user', 'updates.user'])
+                ->forDate($date)
+                ->where('status', $col)
+                ->orderBy('position')
+                ->get()
+                ->map(function ($a) {
+                    $a->latest_update = $a->latestUpdate;
+                    return $a;
+                });
+        }
 
         return Inertia::render('Dashboard', [
             'activities' => $activities,
-            'teamStats' => $teamStats,
+            'date' => $date,
         ]);
     }
 }

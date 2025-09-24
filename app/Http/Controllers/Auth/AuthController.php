@@ -43,12 +43,12 @@ class AuthController extends Controller
             $user = Auth::user();
 
             // Check if user account is active
-            if (!$user->is_active) {
-                Auth::logout();
-                return redirect()->back()->withErrors([
-                    'email' => 'Account deactivated. Please contact system administrator.',
-                ]);
-            }
+            // if (!$user->is_active) {
+            //     Auth::logout();
+            //     return redirect()->back()->withErrors([
+            //         'email' => 'Account deactivated. Please contact system administrator.',
+            //     ]);
+            // }
 
             // Update last login timestamp
             // $user->update(['last_login_at' => now()]);

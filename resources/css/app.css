@@ -1,6 +1,6 @@
 @import "tailwindcss";
-/* @import "tw-animate-css"; */
-/* 
+@import "tw-animate-css";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -140,11 +140,10 @@ body {
   body {
     @apply bg-background text-foreground;
   }
-} */
+}
 
 
-@theme {
-  /* Beautiful Color Palette */
+/* @theme {
   --background: 210 40% 98%;
   --foreground: 222 47% 11%;
   --card: 0 0% 100%;
@@ -165,10 +164,10 @@ body {
   --input: 214 32% 91%;
   --ring: 210 100% 50%;
   --radius: 0.75rem;
-}
+} */
 
 /* Gradient backgrounds and beautiful shadows */
-.gradient-bg {
+/* .gradient-bg {
   background: linear-gradient(135deg, hsl(210, 100%, 97%) 0%, hsl(210, 100%, 99%) 100%);
 }
 
@@ -180,10 +179,10 @@ body {
 .card-hover:hover {
   transform: translateY(-2px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
+} */
 
 /* Beautiful status indicators */
-.status-done {
+/* .status-done {
   background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
 }
 
@@ -193,10 +192,10 @@ body {
 
 .status-in-progress {
   background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
-}
+} */
 
 /* Custom scrollbar */
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
   width: 6px;
 }
 
@@ -221,4 +220,4 @@ body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   font-feature-settings: "rlig" 1, "calt" 1;
-}
+} */

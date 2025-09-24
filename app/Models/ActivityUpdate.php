@@ -10,24 +10,20 @@ class ActivityUpdate extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'activity_id',
+    protected $fillable =
+    [
+        'daily_activity_id',
         'user_id',
         'status',
-        'remarks',
-        'update_time'
+        'remark'
     ];
 
-    protected $casts = [
-        'update_time' => 'datetime'
-    ];
-
-    public function activity(): BelongsTo
+    public function dailyActivity()
     {
-        return $this->belongsTo(Activity::class);
+        return $this->belongsTo(DailyActivity::class);
     }
-
-    public function user(): BelongsTo
+    
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

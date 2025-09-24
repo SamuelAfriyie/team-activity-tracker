@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('activity_updates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('activity_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['pending', 'done']);
-            $table->text('remarks')->nullable();
-            $table->timestamp('update_time');
+            $table->foreignId('daily_activity_id')->constrained('daily_activities')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->enum('status', ['todo', 'in_progress', 'done']);
+            $table->text('remark')->nullable();
             $table->timestamps();
         });
     }
