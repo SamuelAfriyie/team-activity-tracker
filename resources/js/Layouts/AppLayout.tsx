@@ -1,123 +1,66 @@
-import React from 'react'
-import { Head, Link } from '@inertiajs/react'
-import { Button } from '@/Components/ui/button'
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/Components/ui/dropdown-menu'
-import { 
-  Bell, 
-  Users, 
-  BarChart3, 
-  Settings, 
-  LogOut, 
-  User 
+import { Link, usePage } from '@inertiajs/react'
+import { PropsWithChildren } from 'react'
+import { cn } from '@/lib/utils'
+import {
+  LayoutDashboard,
+  FileClock,
+  LogOut,
+  ClipboardList,
 } from 'lucide-react'
-import { User as UserType } from '@/types/inertia'
+import { route } from '@/lib/route'
 
-interface AppLayoutProps {
-  children: React.ReactNode
-  user?: UserType
-  header?: string
-}
+const sidebarItems = [
+  { name: 'Dashboard', route: 'dashboard', icon: LayoutDashboard },
+  { name: 'Activities', route: 'activities.index', icon: ClipboardList },
+  { name: 'Reports', route: 'reports.index', icon: FileClock },
+]
 
-export default function AppLayout({ children, user, header }: AppLayoutProps) {
+export default function AppLayout({ children }: PropsWithChildren) {
+  const { url } = usePage()
+
   return (
-    <>
-      <Head>
-        <title>Team Activity Tracker</title>
-      </Head>
-
-      <div className="min-h-screen bg-background">
-        {/* Sidebar */}
-        <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-          <div className="flex flex-col flex-1 min-h-0 border-r bg-background">
-            <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
-              <div className="flex items-center flex-shrink-0 px-4">
-                <Link href="/" className="text-2xl font-bold text-foreground">
-                  ActivityTracker
-                </Link>
-              </div>
-              <nav className="mt-8 flex-1 px-4 space-y-2">
-                <Link
-                  href="/dashboard"
-                  className="flex items-center px-4 py-2 text-sm font-medium rounded-lg text-foreground hover:bg-accent"
-                >
-                  <BarChart3 className="mr-3 h-5 w-5" />
-                  Dashboard
-                </Link>
-                <Link
-                  href="/activities"
-                  className="flex items-center px-4 py-2 text-sm font-medium rounded-lg text-foreground hover:bg-accent"
-                >
-                  <Users className="mr-3 h-5 w-5" />
-                  Activities
-                </Link>
-                <Link
-                  href="/reports"
-                  className="flex items-center px-4 py-2 text-sm font-medium rounded-lg text-foreground hover:bg-accent"
-                >
-                  <BarChart3 className="mr-3 h-5 w-5" />
-                  Reports
-                </Link>
-              </nav>
-            </div>
-            <div className="flex flex-shrink-0 p-4 border-t">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-start">
-                    <User className="mr-2 h-4 w-4" />
-                    <span className="truncate">{user?.name}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/logout" method="post">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Logout
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
+    <div className="flex h-screen">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r flex flex-col">
+        <div className="p-4 text-xl font-bold">Activity Tracker Pro</div> 
+        <nav className="flex-1 space-y-1">
+          {sidebarItems.map((item) => (
+            <Link
+              key={item.route}
+              href={route(item.route)}
+              className={cn(
+                'flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 mx-2 rounded-sm',
+                item.route === 'dashboard'
+                  ? url === '/'
+                    ? 'bg-muted font-semibold text-blue-600'
+                    : ''
+                  : url.startsWith(`/${item.route.split('.')[0]}`)
+                    ? 'bg-muted font-semibold text-blue-600'
+                    : ''
+              )}
+            >
+              <item.icon className="w-5 h-5 mr-2" />
+              {item.name}
+            </Link>
+          ))}
+        </nav>
+        <div className="p-4 border-t">
+          <Link
+            href={route('logout')}
+            method="post"
+            as="button"
+            className="flex items-center text-red-600 hover:text-red-800"
+          >
+            <LogOut className="w-5 h-5 mr-2" />
+            Logout
+          </Link>
         </div>
+      </aside>
 
-        {/* Main content */}
-        <div className="md:pl-64 flex flex-col flex-1">
-          {/* Header */}
-          <header className="shrink-0 border-b">
-            <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-              <div>
-                <h1 className="text-2xl font-semibold text-foreground">
-                  {header}
-                </h1>
-              </div>
-              <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="icon">
-                  <Bell className="h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-          </header>
-
-          {/* Page content */}
-          <main className="flex-1 p-6">
-            {children}
-          </main>
-        </div>
-      </div>
-    </>
+      {/* Content */}
+      <main className="flex-1 overflow-y-auto bg-gray-50">
+        {children}
+      </main>
+    </div>
   )
 }

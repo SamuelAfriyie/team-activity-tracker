@@ -1,97 +1,157 @@
-import React from 'react'
-import { Head } from '@inertiajs/react'
-import AppLayout from '@/Layouts/AppLayout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card'
-import { Button } from '@/Components/ui/button'
-import { Badge } from '@/Components/ui/badge'
-import { Activity, Users, CheckCircle, Clock } from 'lucide-react'
-import { SharedPageProps } from '@/types/inertia'
+import React, { useState, useEffect } from "react";
+import { Inertia } from "@inertiajs/inertia";
+import { usePage } from "@inertiajs/react";
+import AppLayout from "@/Layouts/AppLayout";
+import ActivityCard from "@/Components/ActivityCard";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+import { route } from "@/lib/route";
+import { Button } from "@/Components/ui/button";
+import axios from "axios";
+import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/Components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
-export default function Dashboard({ auth }: SharedPageProps) {
-  const stats = [
-    { label: 'Total Activities', value: '24', icon: Activity, change: '+12%' },
-    { label: 'Team Members', value: '8', icon: Users, change: '+2' },
-    { label: 'Completed Today', value: '18', icon: CheckCircle, change: '+5' },
-    { label: 'Pending', value: '6', icon: Clock, change: '-2' },
-  ]
+type Activity = any;
+type Props = {
+  activities: Record<string, Activity[]>;
+  date: string;
+};
 
-  const recentActivities = [
-    { id: 1, title: 'SMS Count Comparison', user: 'John Doe', time: '2 hours ago', status: 'done' },
-    { id: 2, title: 'Server Health Check', user: 'Jane Smith', time: '4 hours ago', status: 'pending' },
-    { id: 3, title: 'Database Backup', user: 'Mike Johnson', time: '6 hours ago', status: 'done' },
-  ]
+export default function Dashboard() {
+  const { props } = usePage<any>();
+  const serverActivities: Record<string, Activity[]> = props.activities || { pending: [], done: [] };
+  const date: string = props.date;
+
+  const [filterDate, setDate] = useState<Date>();
+
+  // maintain local state for optimistic UI
+  const [activities, setActivities] = useState<Record<string, Activity[]>>(serverActivities);
+
+  // update state when server props change (e.g., after navigation)
+  useEffect(() => setActivities(serverActivities), [serverActivities]);
+
+  console.log("Activities structure: ", serverActivities)
+
+  async function onDragEnd(result: DropResult) {
+    if (!result.destination) return;
+
+    const sourceCol = result.source.droppableId;
+    const destCol = result.destination.droppableId;
+    const sourceIndex = result.source.index;
+    const destIndex = result.destination.index;
+
+    // clone state
+    const local = {
+      pending: [...(activities.pending || [])],
+      // in_progress: [...(activities.in_progress || [])], 
+      done: [...(activities.done || [])],
+    } as any;
+
+    // remove from source
+    const [moved] = local[sourceCol].splice(sourceIndex, 1);
+    // insert into destination
+    local[destCol].splice(destIndex, 0, moved);
+
+    // optimistic UI update
+    setActivities(local);
+
+    // build payload - arrays of ids per column (persistent ordering)
+    const payloadColumns: Record<string, number[]> = {};
+    (Object.keys(local) as (keyof typeof local)[]).forEach((k: any) => {
+      payloadColumns[k] = local[k].map((a: any) => a.id);
+    });
+
+    await axios.post(route("daily.reorder"), {
+      columns: payloadColumns, date
+    }).then(() => {
+      console.log("Updated successfully");
+    }).catch(() => {
+      alert("failed")
+      Inertia.reload();
+    });
+  }
+
+  const handleDateSelect = (newDate: Date | undefined) => {
+    if (newDate) {
+      setDate(newDate);
+    }
+  };
+
+  const columns = ["pending", "done"];
 
   return (
-    <AppLayout user={auth.user} header="Dashboard">
-      <Head title="Dashboard" />
+    <AppLayout>
+      <div className="flex flex-col h-screen">
+        {/* 🔹 Top Navbar */}
+        <header className="w-full bg-white shadow px-6 py-3 flex items-center justify-between">
+          <h1 className="text-xl font-bold">Team Activity Tracker</h1>
 
-      {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        {stats.map((stat) => (
-          <Card key={stat.label}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.label}</CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">{stat.change}</span> from yesterday
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+          <div className="flex gap-3 items-center">
+            <span className="text-gray-600 text-sm">Date: {format(filterDate ?? date, "PPP")}</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size={'sm'} >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  Switch Date
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={filterDate}
+                  onSelect={handleDateSelect}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </header>
 
-      {/* Recent Activities */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activities</CardTitle>
-            <CardDescription>Latest updates from your team</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">{activity.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      by {activity.user} • {activity.time}
-                    </p>
-                  </div>
-                  <Badge variant={activity.status === 'done' ? 'default' : 'secondary'}>
-                    {activity.status === 'done' ? 'Completed' : 'Pending'}
-                  </Badge>
-                </div>
+        {/* 🔹 Page Content */}
+        <main className="flex-1 p-6 overflow-hidden">
+          <h2 className="text-lg font-semibold mb-4">Daily Board</h2>
+
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div className="grid grid-cols-2 gap-6 h-[calc(100vh-140px)]">
+              {columns.map((col) => (
+                <Droppable droppableId={col} key={col}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={`flex flex-col rounded-lg border-2 border-dashed transition-colors
+                      ${snapshot.isDraggingOver ? "border-blue-400 bg-blue-50/50" : "border-gray-300 bg-gray-50"}
+                      `}
+                    >
+                      {/* Column Header */}
+                      <div className="px-3 py-2 border-b bg-white rounded-t-lg">
+                        <h3 className="capitalize font-medium">{col}</h3>
+                      </div>
+
+                      {/* Scrollable Task Area */}
+                      <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-[400px] max-h-[600px]">
+                        {((activities[col] || []) as any[]).map((act: any, index: number) => (
+                          <Draggable draggableId={`${act.id}`} index={index} key={act.id}>
+                            {(p) => (
+                              <div ref={p.innerRef} {...p.draggableProps} {...p.dragHandleProps}>
+                                <ActivityCard activity={act} />
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    </div>
+                  )}
+                </Droppable>
               ))}
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks and operations</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <Button className="w-full justify-start" variant="outline">
-                <Activity className="mr-2 h-4 w-4" />
-                Add New Activity
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <Users className="mr-2 h-4 w-4" />
-                View Team Report
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Mark Activities Complete
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          </DragDropContext>
+        </main>
       </div>
     </AppLayout>
-  )
+  );
 }

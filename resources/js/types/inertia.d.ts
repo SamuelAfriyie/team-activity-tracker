@@ -7,7 +7,9 @@ export interface User {
     position?: string
     department?: string
     employee_id?: string
-    phone?: string
+    phone?: string,
+    is_admin?: bool,
+    last_login_at: Date
 }
 
 export interface Activity {
